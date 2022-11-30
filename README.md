@@ -6,8 +6,9 @@ Jsou ve formátu [GTFS](https://developers.google.com/transit/gtfs/reference/)
 
 Výcuc z dokumentace výše:
 - routes.txt: číslo linky – ID linky (route_id)
-- trips.txt: ID linky (route_id) - kam jede (konečná) – ID cesty, (volitelně) service_id – ID obsluhy, calendar.txt udává, kdy daný jízdní řád platí. Nejdříve naprogramujte bez přihlédnutí ke kalendáři (předpokládejte, že v jeden den jezdí spoje ze všech dnů), zbyde-li čas, vyfiltrujte jen na spoje, které jezdí v pondělí.
+- trips.txt: ID linky (route_id) - kam jede (konečná), trip_id – ID cesty, (volitelně) service_id – ID obsluhy, calendar.txt udává, kdy daná obsluha platí. Nejdříve naprogramujte bez přihlédnutí ke kalendáři (předpokládejte, že v jeden den jezdí spoje ze všech dnů), zbyde-li čas, vyfiltrujte jen na spoje, které jezdí v pondělí.
 - stops.txt: ID zastávky (stop_id) – název zastávky. parent_station je stop_id hlavní zastávky – v některých případech má zastávka více podzastávek, když je například více nástupišť. Vynecháváte-li transfers.txt, berte místo každé ze zastávek jen její parent_station, existuje-li.
+- stop_times.txt: Časy odjezdů jednotlivých spojů (cest) z jednotlivých zastávek. ID cesty trip_id, arrival time, departure time, stop_id
 - (volitelně) transfers.txt: pěší přechod z jedné zastávky na druhou a jak dlouho trvá. každá zastávka může mít více nástupišť, mezi nimi je nutné se transferovat. Každé nástupiště má jednu stop_id. Lze vynechat.
 
 **Úkol**: napište funkci, která dostane ID zastávky, čas a počet minut vrátí množinu všech zastávek, na které se v danou dobu dá za daný počet minut dostat.
