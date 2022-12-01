@@ -17,7 +17,7 @@ Neřešte efektivitu programu. Jádro úkolu je prohledávání do šířky – 
 
 Pracujete ve dvojicích. Nejdřív se společně dohodněte na signaturách funkcí a následně si rozdělte práci – jeden může programovat hledání, druhý získávání dat z textových (CSV) souborů.
 
-V souboru snippets.py máte k dispozici kusy kódu, které by se vám mohly hodit.
+V souboru sol.py máte k dispozici kostru řešení.
 
 ## Práce ve dvojici:
 
