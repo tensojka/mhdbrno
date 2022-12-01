@@ -5,7 +5,7 @@ import heapq
 StopId = str
 Time = int
 TripId = str
-Departure = Tuple[Time, TripId]
+Departure = Tuple[Time, TripId] # departure 
 Moment = Tuple[Time, StopId, StopId]  # one moment in spacetime. Last StopId is origin stop, first StopId is current stop.
 stop_times_by_tripid: Dict[TripId, List["StopTime"]] = dict()
 trips = dict()
@@ -40,13 +40,11 @@ class Trip:
     @property
     def stops(self):
         '''Get a list of StopTimes this Trip stops at. Generated just in time, only if needed. Access with trip.stops'''
-        # yes this is inefficient and i know it
         if self._stops is not None:
             return self._stops
         self._stops = []
-        for stop_time in stop_times_by_tripid:
-            if stop_time.trip_id == self.trip_id:
-                self._stops.append(stop_time)
+        for stop_time in stop_times_by_tripid[self.trip_id]:
+            self._stops.append(stop_time)
 
 
 class StopTime:
