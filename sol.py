@@ -5,14 +5,14 @@ import heapq
 StopId = str
 Time = int
 TripId = str
-Departure = Tuple[Time, TripId] # departure 
+Departure = Tuple[Time, TripId]  # departure
 Moment = Tuple[Time, StopId, "StopTime"]  # one moment in spacetime. stopTime is origin stop, StopId is current stop.
 stop_times_by_tripid: Dict[TripId, List["StopTime"]] = dict()
 trips: Dict[TripId, "Trip"] = dict()
 stops: Dict[StopId, "Stop"] = dict()
 stops_by_canonical_id: Dict[StopId, List[StopId]] = dict()  # holds all stops that correspond to a given canonical stop, including the canonical stop itself
 
-###### misc
+#---- misc
 
 def parse_time(inp: str) -> Time:
     '''Parse time from 12:34:00 into amount of seconds since midnight'''
@@ -27,7 +27,8 @@ def parse_time(inp: str) -> Time:
     res += int(parts[2])
     return res
 
-###### classes
+#---- classes
+
 
 '''Holds information about one Trip of a vehicle from its start stop to its terminus.'''
 class Trip:
@@ -36,7 +37,7 @@ class Trip:
         self.route_id = line['route_id']
         self.trip_headsign = line['trip_headsign']
         self._stops: Optional[List[StopTime]] = None
-    
+
     @property
     def stops(self):
         '''Get a list of StopTimes this Trip stops at. Generated just in time, only if needed. Access with trip.stops'''
@@ -65,17 +66,17 @@ class Stop:
             stops_by_canonical_id[parent_station] = [stop_id]
         else:
             stops_by_canonical_id[parent_station].append(stop_id)
-    
+
     def get_canonical(self) -> "Stop":
         if len(self.parent_station) > 0:
             return stops[self.parent_station]
         else:
             return self
-    
+
     def __str__(self) -> str:
         return self.stop_name
 
-###### loading
+#---- loading
 
 def load_file(filename: str):
     with open(filename) as file:
@@ -131,7 +132,7 @@ trips = load_trips("gtfs/trips.txt")
 stops = load_stops("gtfs/stops.txt")
 stop_times_by_tripid, stop_times_by_stopid = load_stop_times("gtfs/stop_times.txt")
 
-###### niceties
+#---- niceties
 
 def human_readable_time(secs_since_midnight: Time) -> str:
     hours = str(secs_since_midnight // (60 * 60))
@@ -139,16 +140,18 @@ def human_readable_time(secs_since_midnight: Time) -> str:
     secs = str(secs_since_midnight % 60)
     return f'{hours.zfill(2)}:{mins.zfill(2)}:{secs.zfill(2)}'
 
+
 def human_readable_visit(moment: Tuple[StopId, Tuple[StopId, Time]]) -> str:
     stopid, o = moment
     origin, secs_since_midnight = o
     return f'{stops[stopid]} at {human_readable_time(secs_since_midnight)} from {stops[origin]}'
 
+
 def human_readable_stop(stopid: str) -> str:
     return str(stops[stopid])
 
 
-###### core functionality
+#---- core functionality
 
 def leaves_from_stop(stop_id: StopId, currtime: Time, max_wait=20*60) -> List[Departure]:
     res: List[Departure] = []
@@ -156,10 +159,11 @@ def leaves_from_stop(stop_id: StopId, currtime: Time, max_wait=20*60) -> List[De
     for stop_id in stops_by_canonical_id[canonical_stop_id]:
         for stop_time in stop_times_by_stopid.get(stop_id, []):
             if stop_time.departure_time > currtime and \
-                max_wait + currtime < stop_time.departure_time:
+              max_wait + currtime < stop_time.departure_time:
                 new = stop_time.departure_time, stop_time.trip_id
                 res.append(new)
     return res
+
 
 # get all possible disembarkements from a connection you jumped on
 # origin is only for path tracking
