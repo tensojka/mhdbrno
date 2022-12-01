@@ -1,16 +1,16 @@
 import csv
-from typing import List, Tuple, Any, Dict, Optional, Union
+from typing import List, Tuple, Dict, Optional
 import heapq
 
 StopId = str
 Time = int
 TripId = str
 Departure = Tuple[Time, TripId] # departure 
-Moment = Tuple[Time, StopId, StopId]  # one moment in spacetime. Last StopId is origin stop, first StopId is current stop.
+Moment = Tuple[Time, StopId, "StopTime"]  # one moment in spacetime. stopTime is origin stop, StopId is current stop.
 stop_times_by_tripid: Dict[TripId, List["StopTime"]] = dict()
-trips = dict()
-stops = dict()
-stops_by_canonical_id: Dict[StopId, List[StopId]] = dict()
+trips: Dict[TripId, "Trip"] = dict()
+stops: Dict[StopId, "Stop"] = dict()
+stops_by_canonical_id: Dict[StopId, List[StopId]] = dict()  # holds all stops that correspond to a given canonical stop, including the canonical stop itself
 
 ###### misc
 
@@ -102,8 +102,8 @@ def load_stop_times(filename: str) -> Tuple[Dict[TripId, List["StopTime"]], Dict
     '''
     with open(filename) as file:
         stop_times_raw = csv.DictReader(file, quotechar='"', delimiter=",")
-        res = dict()
-        res_stopid = dict()
+        res: Dict[TripId, List["StopTime"]] = dict()
+        res_stopid: Dict[StopId, List["StopTime"]] = dict()
         for raw in stop_times_raw:
             stop_time = StopTime(raw['\ufefftrip_id'], raw['arrival_time'], raw['departure_time'], raw['stop_id'], raw['stop_sequence'])
             if raw['\ufefftrip_id'] in res:
@@ -152,7 +152,7 @@ def human_readable_stop(stopid: str) -> str:
 
 def leaves_from_stop(stop_id: StopId, currtime: Time, max_wait=20*60) -> List[Departure]:
     res: List[Departure] = []
-    canonical_stop_id = stops[stop_id].get_canonical().stop_id
+    canonical_stop_id = canonical(stop_id)
     for stop_id in stops_by_canonical_id[canonical_stop_id]:
         for stop_time in stop_times_by_stopid.get(stop_id, []):
             if stop_time.departure_time > currtime and \
@@ -168,7 +168,8 @@ def get_arrivals_from_departure(departure: Departure, origin: StopTime) -> List[
     res: List[Moment] = []
     for stop_time in stop_times_by_tripid[trip_id]:
         if stop_time.arrival_time > departure_time:
-            res.append(tuple([stop_time.arrival_time, stop_time.stop_id, origin]))
+            arrival = stop_time.arrival_time, stop_time.stop_id, origin
+            res.append(arrival)
     return res
 
 
